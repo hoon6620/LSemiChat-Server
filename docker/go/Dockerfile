@@ -7,7 +7,7 @@ ADD . .
 # realizeはgomodに対応していないらしい
 RUN apk update \
     && apk add git \
-    && GO111MODULE=off go get github.com/oxequa/realize \
+    && GO111MODULE="on" go get github.com/yyh-gl/realize@master \
     && go get -v ./... \
     && go build -o ./binary/app ./cmd
 

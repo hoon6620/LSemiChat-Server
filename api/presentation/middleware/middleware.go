@@ -17,8 +17,8 @@ import (
 
 // var mode *string
 var (
-	allowOrigin  = "*"
 	allowHeaders = "*"
+	allowOrigin  = "*"
 )
 
 type mode string
@@ -32,8 +32,8 @@ func init() {
 	modeFlag := flag.String("mode", "production", "run mode. value=[develop, production]")
 	flag.Parse()
 	if *modeFlag == string(develop) {
-		allowOrigin = "http://localhost:3000"
 		allowHeaders = "Content-Type"
+		allowOrigin = "http://localhost:3000"
 	}
 	llog.Info(fmt.Sprintf("run mode is %s", *modeFlag))
 }
@@ -68,9 +68,15 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			response.Unauthorized(w, errors.Wrap(err, "failed to get session"), "failed to authorization")
 			return
 		}
+
 		claims := token.Claims.(jwt.MapClaims)
 		ctx = lcontext.SetUserID(ctx, claims[constants.JWTUserIDClaimsKey].(string))
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func AdminMiddleware(next http.Handler) http.Handler {
+	//TODO AdminMidleware
+	return nil
 }

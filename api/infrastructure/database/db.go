@@ -2,6 +2,7 @@ package database
 
 import (
 	"app/api/constants"
+	"app/api/infrastructure/nosql"
 	"app/api/llog"
 	"database/sql"
 	"fmt"
@@ -22,6 +23,7 @@ type sqlHandler struct {
 }
 
 func New() (SQLHandler, error) {
+	nosql.New()
 	dbuser := os.Getenv("MYSQL_USER")
 	if dbuser == "" {
 		dbuser = constants.DBUser

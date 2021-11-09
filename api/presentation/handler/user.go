@@ -16,18 +16,18 @@ type userHandler struct {
 }
 
 type UserHandler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	UpdateProfile(w http.ResponseWriter, r *http.Request)
-	UpdateUserID(w http.ResponseWriter, r *http.Request)
-	UpdatePassword(w http.ResponseWriter, r *http.Request)
-	GetMe(w http.ResponseWriter, r *http.Request)
-	GetByID(w http.ResponseWriter, r *http.Request)
-	GetAll(w http.ResponseWriter, r *http.Request)
-	DeleteMe(w http.ResponseWriter, r *http.Request)
-	GetFollows(w http.ResponseWriter, r *http.Request)
-	Follow(w http.ResponseWriter, r *http.Request)
-	Unfollow(w http.ResponseWriter, r *http.Request)
-	GetFollowers(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)         //Create account
+	UpdateProfile(w http.ResponseWriter, r *http.Request)  //Update user profile
+	UpdateUserID(w http.ResponseWriter, r *http.Request)   //Update user ID
+	UpdatePassword(w http.ResponseWriter, r *http.Request) //Update user password
+	GetMe(w http.ResponseWriter, r *http.Request)          //Get my profile
+	GetByID(w http.ResponseWriter, r *http.Request)        //Get user profile by ID
+	GetAll(w http.ResponseWriter, r *http.Request)         //Get all users
+	DeleteMe(w http.ResponseWriter, r *http.Request)       //Delete my accound
+	Follow(w http.ResponseWriter, r *http.Request)         //Follow user
+	Unfollow(w http.ResponseWriter, r *http.Request)       //Unfollow user
+	GetFollows(w http.ResponseWriter, r *http.Request)     //Get follows by user ID
+	GetFollowers(w http.ResponseWriter, r *http.Request)   //Get followers by user ID
 }
 
 func NewUserHandler(ui interactor.UserInteractor) UserHandler {

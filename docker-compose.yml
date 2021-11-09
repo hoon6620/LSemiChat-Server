@@ -3,6 +3,7 @@ services:
   api:
     depends_on:
       - db
+      - redis
     build:
       context: .
       dockerfile: ./docker/go/Dockerfile
@@ -14,10 +15,12 @@ services:
       MYSQL_DATABASE: ls_chat
       MYSQL_HOST: db
       MYSQL_PORT: 3306
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
     volumes:
       - .:/go/src/app
     ports:
-      - 8080:8080
+      - "8080:8080"
     restart: always
     command: realize start
 
@@ -35,5 +38,15 @@ services:
       # この辺は必要なら適宜
       - ./db/mysql/init.d:/docker-entrypoint-initdb.d
     ports:
-      - 3306:3306
+      - "3307:3306"
+    restart: always
+
+  redis:
+    image: redis:6.2.4
+    container_name: l-semi-token-db
+    command: redis-server --bind 0.0.0.0 --port 6379
+    environment: 
+      REDIS_PASSWORD: password
+    ports:
+      - "6379:6379"
     restart: always

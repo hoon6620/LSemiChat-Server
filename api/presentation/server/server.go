@@ -38,10 +38,13 @@ func (s *server) Serve() {
 func (s *server) Route(appHandler *handler.AppHandler) {
 
 	s.Handler.Use(middleware.CommonMiddleware)
+
 	authRouter := s.Handler.PathPrefix("/").Subrouter()
 	authRouter.Use(middleware.AuthMiddleware)
+
 	adminRouter := s.Handler.PathPrefix("/").Subrouter()
 	// TODO: middleware
+	//adminRouter.Use(middleware.AdminMiddleware)
 
 	s.Handler.HandleFunc("/ping", pingHandler).Methods(http.MethodGet, http.MethodOptions)
 
@@ -60,37 +63,50 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 
 	{
 		authRouter.HandleFunc("/logout", appHandler.AuthHandler.Logout).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/account", appHandler.UserHandler.GetMe).Methods(http.MethodGet, http.MethodOptions)
+		authRouter.HandleFunc("/account", appHandler.UserHandler.DeleteMe).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/account/profile", appHandler.UserHandler.UpdateProfile).Methods(http.MethodPut, http.MethodOptions)
 		authRouter.HandleFunc("/account/user-id", appHandler.UserHandler.UpdateUserID).Methods(http.MethodPut, http.MethodOptions)
 		authRouter.HandleFunc("/account/password", appHandler.UserHandler.UpdatePassword).Methods(http.MethodPut, http.MethodOptions)
-		authRouter.HandleFunc("/account", appHandler.UserHandler.DeleteMe).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/users/{followedUUID}/follows", appHandler.UserHandler.Follow).Methods(http.MethodPost, http.MethodOptions)
 		authRouter.HandleFunc("/users/{followedUUID}/follows", appHandler.UserHandler.Unfollow).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/tags", appHandler.TagHandler.Create).Methods(http.MethodPost, http.MethodOptions)
+
+		// TODO: thread search
 		authRouter.HandleFunc("/threads", appHandler.ThreadHandler.Create).Methods(http.MethodPost, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{id}", appHandler.ThreadHandler.Update).Methods(http.MethodPut, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{id}", appHandler.ThreadHandler.Delete).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{id}/members", appHandler.ThreadHandler.Join).Methods(http.MethodPost, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{id}/members", appHandler.ThreadHandler.Leave).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{id}/members/{userID}", appHandler.ThreadHandler.ForceToLeave).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.GetByThreadID).Methods(http.MethodGet, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.Create).Methods(http.MethodPost, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{threadID}/messages/{messageID}", appHandler.MessageHandler.AddFavorite).Methods(http.MethodPost, http.MethodOptions)
 
-		// TODO: impl
 		authRouter.HandleFunc("/account/tags", appHandler.TagHandler.AddTagToUser).Methods(http.MethodPost, http.MethodOptions)
+
 		authRouter.HandleFunc("/account/tags/{tagID}", appHandler.TagHandler.RemoveTagFromUser).Methods(http.MethodDelete, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{threadID}/tags", appHandler.TagHandler.AddTagToThread).Methods(http.MethodPost, http.MethodOptions)
+
 		authRouter.HandleFunc("/threads/{threadID}/tags/{tagID}", appHandler.TagHandler.RemoveTagFromThread).Methods(http.MethodDelete, http.MethodOptions)
 
+		authRouter.HandleFunc("/ws", appHandler.SocketHandler.WebsocketConnect).Methods(http.MethodGet, http.MethodOptions)
 	}
 
 	{
 		adminRouter.HandleFunc("/categories", appHandler.CategoryHandler.Create).Methods(http.MethodPost, http.MethodOptions)
+
 		adminRouter.HandleFunc("/categories/{id}", appHandler.CategoryHandler.Update).Methods(http.MethodPut, http.MethodOptions)
 		adminRouter.HandleFunc("/categories/{id}", appHandler.CategoryHandler.Delete).Methods(http.MethodDelete, http.MethodOptions)
-
 	}
 
 }

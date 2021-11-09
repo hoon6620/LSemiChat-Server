@@ -10,11 +10,11 @@ import (
 )
 
 type CategoryHandler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	GetByID(w http.ResponseWriter, r *http.Request)
-	GetAll(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)  //Create category
+	GetByID(w http.ResponseWriter, r *http.Request) //Get category by ID
+	GetAll(w http.ResponseWriter, r *http.Request)  //Get all categorys
+	Update(w http.ResponseWriter, r *http.Request)  //Update category
+	Delete(w http.ResponseWriter, r *http.Request)  //Delete category
 }
 
 type categoryHandler struct {

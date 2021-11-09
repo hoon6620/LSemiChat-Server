@@ -2,6 +2,8 @@ package lsession
 
 import (
 	"app/api/constants"
+	"app/api/infrastructure/lcontext"
+	"app/api/infrastructure/nosql"
 	"net/http"
 	"time"
 
@@ -44,45 +46,57 @@ func GetSession(r *http.Request) (*jwt.Token, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get cookie")
 	}
+
 	token, err := jwt.Parse(cookie.Value, func(token *jwt.Token) (interface{}, error) {
 		return []byte(constants.JWTSecret), nil
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse jwt")
 	}
+
+	err = nosql.CheckValidToken(cookie.Value)
+	if err != nil {
+		return nil, errors.Wrap(err, "auth is not valid more")
+	}
+
 	return token, nil
 }
 
-func getCookie(r *http.Request, cookieName string) (*http.Cookie, error) {
-	cookie, err := r.Cookie(cookieName)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get cookie")
-	}
-	return cookie, nil
-}
-
 func deleteCookie(w http.ResponseWriter, r *http.Request, cookieName string) error {
-	cookie, err := getCookie(r, cookieName)
+
+	userid, err := lcontext.GetUserIDFromContext(r.Context())
+	if err != nil {
+		return errors.Wrap(err, "failed to authentication")
+	}
+	nosql.DeleteAuth(userid)
+
+	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return errors.Wrap(err, "failed to delete cookie")
 	}
 	cookie.MaxAge = -1
+
 	http.SetCookie(w, cookie)
 	return nil
 }
 
 func createJWT(userID string) (string, error) {
-	token := jwt.New(jwt.GetSigningMethod("HS256"))
+	token := jwt.New(jwt.GetSigningMethod("HS256")) //HS256 || RSA
+	rTime := time.Now().Add(time.Hour * 1)
 
 	token.Claims = jwt.MapClaims{
 		constants.JWTUserIDClaimsKey: userID,
-		"exp":                        time.Now().Add(time.Hour * 1).Unix(),
+		"exp":                        rTime.Unix(),
 	}
 
 	secretKey := constants.JWTSecret
 	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		return "", errors.Wrap(err, "failed to get jwt string")
+	}
+
+	if err = nosql.CreateAuth(userID, rTime, tokenString); err != nil {
+		return "", errors.Wrap(err, "failed to set jwt in nosql")
 	}
 	return tokenString, nil
 }

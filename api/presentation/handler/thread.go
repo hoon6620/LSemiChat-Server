@@ -11,16 +11,16 @@ import (
 )
 
 type ThreadHandler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	GetAll(w http.ResponseWriter, r *http.Request)
-	GetByID(w http.ResponseWriter, r *http.Request)
-	GetOnlyPublic(w http.ResponseWriter, r *http.Request)
-	GetMembersByThreadID(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
-	Join(w http.ResponseWriter, r *http.Request)
-	Leave(w http.ResponseWriter, r *http.Request)
-	ForceToLeave(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)               //Create thread
+	GetAll(w http.ResponseWriter, r *http.Request)               //Get all threads
+	GetByID(w http.ResponseWriter, r *http.Request)              //Get thread by ID
+	GetOnlyPublic(w http.ResponseWriter, r *http.Request)        //Get public thread
+	GetMembersByThreadID(w http.ResponseWriter, r *http.Request) //Get members in thread
+	Update(w http.ResponseWriter, r *http.Request)               //Thread update
+	Delete(w http.ResponseWriter, r *http.Request)               //Thread delete
+	Join(w http.ResponseWriter, r *http.Request)                 //Join member to thread
+	Leave(w http.ResponseWriter, r *http.Request)                //Leave the thread
+	ForceToLeave(w http.ResponseWriter, r *http.Request)         //Kicked the member from thread
 }
 
 type threadHandler struct {

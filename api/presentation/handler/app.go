@@ -14,6 +14,7 @@ type AppHandler struct {
 	TagHandler      TagHandler
 	ThreadHandler   ThreadHandler
 	MessageHandler  MessageHandler
+	SocketHandler   SocketHandler
 }
 
 func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
@@ -47,5 +48,6 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 		TagHandler:      NewTagHandler(tagInteractor, categoryInteractor),
 		ThreadHandler:   NewThreadHandler(threadInteractor),
 		MessageHandler:  NewMessageHandler(messageInteractor, threadInteractor),
+		SocketHandler:   NewSocketHandler(messageInteractor, threadInteractor),
 	}
 }

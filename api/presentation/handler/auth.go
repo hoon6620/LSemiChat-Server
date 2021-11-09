@@ -11,8 +11,8 @@ import (
 )
 
 type AuthHandler interface {
-	Login(w http.ResponseWriter, r *http.Request)
-	Logout(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)  //Login
+	Logout(w http.ResponseWriter, r *http.Request) //Logout
 }
 
 type authHandler struct {
@@ -34,23 +34,29 @@ func (ah *authHandler) Login(w http.ResponseWriter, r *http.Request) {
 	req, _ := src.(*request.LoginRequest)
 
 	// validation
-	if req.UserID == "" || req.Password == "" {
-		response.BadRequest(w, errors.New("request field is empty"), "failed to validation")
+	if req.UserID == "" {
+		response.BadRequest(w, errors.New("ID field is empty"), "failed to validation")
 		return
 	}
-
+	if req.Password == "" {
+		response.BadRequest(w, errors.New("Password field is empty"), "failed to validation")
+		return
+	}
+	//Login check
 	err = ah.authInteractor.Login(req.UserID, req.Password)
 	if err != nil {
 		response.BadRequest(w, errors.Wrap(err, "failed to authentication"), "failed to authentication")
 		return
 	}
 
+	//Session start
 	token, err := lsession.StartSession(w, req.UserID)
 	if err != nil {
 		response.InternalServerError(w, errors.Wrap(err, "failed to start session"), "failed to login")
 		return
 	}
 
+	//Set token
 	res := &response.LoginResponse{
 		Token: token,
 	}

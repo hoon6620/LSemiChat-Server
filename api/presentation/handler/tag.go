@@ -11,13 +11,13 @@ import (
 )
 
 type TagHandler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	GetAll(w http.ResponseWriter, r *http.Request)
-	GetByID(w http.ResponseWriter, r *http.Request)
-	AddTagToUser(w http.ResponseWriter, r *http.Request)
-	RemoveTagFromUser(w http.ResponseWriter, r *http.Request)
-	AddTagToThread(w http.ResponseWriter, r *http.Request)
-	RemoveTagFromThread(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)              //Creeate tag
+	GetAll(w http.ResponseWriter, r *http.Request)              //Get all tags
+	GetByID(w http.ResponseWriter, r *http.Request)             //Get tag by ID
+	AddTagToUser(w http.ResponseWriter, r *http.Request)        //Add tag to user
+	RemoveTagFromUser(w http.ResponseWriter, r *http.Request)   //Remove tag from user
+	AddTagToThread(w http.ResponseWriter, r *http.Request)      //Add tag to thread
+	RemoveTagFromThread(w http.ResponseWriter, r *http.Request) //Remove tag from thread
 }
 
 type tagHandler struct {

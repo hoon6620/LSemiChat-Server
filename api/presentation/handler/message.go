@@ -12,9 +12,9 @@ import (
 )
 
 type MessageHandler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	GetByThreadID(w http.ResponseWriter, r *http.Request)
-	AddFavorite(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request)        //Create Massage
+	GetByThreadID(w http.ResponseWriter, r *http.Request) //Get Thread Messages
+	AddFavorite(w http.ResponseWriter, r *http.Request)   //Add favorite(Like) message
 }
 
 type messageHandler struct {
@@ -35,6 +35,7 @@ func (mh *messageHandler) Create(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(w, errors.Wrap(err, "path parameter is empty"), "path parameter is empty")
 		return
 	}
+
 	userID, err := lcontext.GetUserIDFromContext(r.Context())
 	if err != nil {
 		response.Unauthorized(w, errors.Wrap(err, "failed to authentication"), "failed to authentication. please login")
@@ -46,6 +47,7 @@ func (mh *messageHandler) Create(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(w, errors.Wrap(err, "failed to read request"), "failed to read request")
 		return
 	}
+
 	req, _ := src.(*request.CreateMessageRequest)
 	err = req.Validation()
 	if err != nil {
@@ -58,7 +60,6 @@ func (mh *messageHandler) Create(w http.ResponseWriter, r *http.Request) {
 		response.InternalServerError(w, errors.Wrap(err, "failed to create message"), "failed to create message")
 		return
 	}
-
 	response.Success(w, response.ConvertToMessageResponse(message))
 }
 
@@ -68,6 +69,7 @@ func (mh *messageHandler) GetByThreadID(w http.ResponseWriter, r *http.Request) 
 		response.BadRequest(w, errors.Wrap(err, "path parameter is empty"), "path parameter is empty")
 		return
 	}
+
 	userID, err := lcontext.GetUserIDFromContext(r.Context())
 	if err != nil {
 		response.Unauthorized(w, errors.Wrap(err, "failed to authentication"), "failed to authentication. please login")
@@ -79,6 +81,7 @@ func (mh *messageHandler) GetByThreadID(w http.ResponseWriter, r *http.Request) 
 		response.BadRequest(w, errors.Wrap(err, "failed to members of thread"), "failed to members of thread")
 		return
 	}
+
 	if !checkMember(userID, members) {
 		response.BadRequest(w, errors.New("not memeber of thread"), "not member of thread")
 		return
@@ -90,7 +93,6 @@ func (mh *messageHandler) GetByThreadID(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	response.Success(w, response.ConvertToMessagesResponse(messages))
-
 }
 
 func (mh *messageHandler) AddFavorite(w http.ResponseWriter, r *http.Request) {
@@ -99,11 +101,13 @@ func (mh *messageHandler) AddFavorite(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(w, errors.Wrap(err, "path parameter is empty"), "path parameter is empty")
 		return
 	}
+
 	messageID, err := ReadPathParam(r, "messageID")
 	if err != nil {
 		response.BadRequest(w, errors.Wrap(err, "path parameter is empty"), "path parameter is empty")
 		return
 	}
+
 	userID, err := lcontext.GetUserIDFromContext(r.Context())
 	if err != nil {
 		response.Unauthorized(w, errors.Wrap(err, "failed to authentication"), "failed to authentication. please login")
