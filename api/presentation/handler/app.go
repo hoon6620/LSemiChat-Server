@@ -15,6 +15,7 @@ type AppHandler struct {
 	ThreadHandler   ThreadHandler
 	MessageHandler  MessageHandler
 	SocketHandler   SocketHandler
+	FileHandler     FileHandler
 }
 
 func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
@@ -49,5 +50,6 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 		ThreadHandler:   NewThreadHandler(threadInteractor),
 		MessageHandler:  NewMessageHandler(messageInteractor, threadInteractor),
 		SocketHandler:   NewSocketHandler(messageInteractor, threadInteractor),
+		FileHandler:     NewFileHandler(userInteractor, threadInteractor),
 	}
 }

@@ -18,6 +18,7 @@ type ThreadInteractor interface {
 	AddMember(threadID, userID string) error
 	RemoveMember(threadID, userID string) error
 	ForceToLeave(requestUserID, threadID, leavedUserID string) error
+	IsParticipated(string, string) bool
 }
 
 type threadInteractor struct {
@@ -191,4 +192,17 @@ func (ti *threadInteractor) RemoveMember(threadID, userID string) error {
 func (ti *threadInteractor) ForceToLeave(requestUserID, threadID, leavedUserID string) error {
 	// TODO: implement
 	return nil
+}
+
+func (ti *threadInteractor) IsParticipated(ThreadID string, UserID string) bool {
+	members, err := ti.threadService.GetMembersByThreadID(ThreadID)
+	if err != nil {
+		return false
+	}
+	for _, member := range members {
+		if member.ID == UserID {
+			return true
+		}
+	}
+	return false
 }

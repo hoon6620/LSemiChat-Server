@@ -60,7 +60,7 @@ func (sh *socketHandler) WebsocketConnect(w http.ResponseWriter, r *http.Request
 
 	connect, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		llog.Error(err)
 	}
 	userID, err := lcontext.GetUserIDFromContext(r.Context())
 	if err != nil {
@@ -208,16 +208,9 @@ func (sh *socketHandler) CheckReadOnly(connect *websocket.Conn, userID string) (
 	return sd.Data, nil //for test
 
 	// //check authorization
-	// users, err := sh.threadInteractor.GetMembersByThreadID(sd.Data)
-	// if err != nil {
-	// 	return "", err
+	// if !sh.threadInteractor.IsParticipated(sd.Data, userID) {
+	// 	return "", errors.New(userID + " are not participated in room " + sd.Data)
+	// } else {
+	// 	return sd.Data, nil
 	// }
-
-	// for _, usr := range users {
-	// 	if usr.UserID == userID {
-	// 		return sd.Data, nil
-	// 	}
-	// }
-
-	// return "", errors.New(userID + " are not participated in room " + sd.Data)
 }

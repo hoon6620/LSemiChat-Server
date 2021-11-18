@@ -88,6 +88,7 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.GetByThreadID).Methods(http.MethodGet, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.Create).Methods(http.MethodPost, http.MethodOptions)
+		authRouter.HandleFunc("/threads/{threadID}/img", appHandler.FileHandler.Upload).Methods(http.MethodPost, http.MethodOptions)
 
 		authRouter.HandleFunc("/threads/{threadID}/messages/{messageID}", appHandler.MessageHandler.AddFavorite).Methods(http.MethodPost, http.MethodOptions)
 
@@ -100,11 +101,12 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 		authRouter.HandleFunc("/threads/{threadID}/tags/{tagID}", appHandler.TagHandler.RemoveTagFromThread).Methods(http.MethodDelete, http.MethodOptions)
 
 		authRouter.HandleFunc("/ws", appHandler.SocketHandler.WebsocketConnect).Methods(http.MethodGet, http.MethodOptions)
+
+		authRouter.HandleFunc("/img/{threadID}/{fileID}", appHandler.FileHandler.Download).Methods(http.MethodGet, http.MethodOptions)
 	}
 
 	{
 		adminRouter.HandleFunc("/categories", appHandler.CategoryHandler.Create).Methods(http.MethodPost, http.MethodOptions)
-
 		adminRouter.HandleFunc("/categories/{id}", appHandler.CategoryHandler.Update).Methods(http.MethodPut, http.MethodOptions)
 		adminRouter.HandleFunc("/categories/{id}", appHandler.CategoryHandler.Delete).Methods(http.MethodDelete, http.MethodOptions)
 	}
