@@ -7,6 +7,7 @@ import (
 	"app/api/presentation/request"
 	"app/api/presentation/response"
 	"net/http"
+	"os"
 
 	"github.com/pkg/errors"
 )
@@ -54,6 +55,11 @@ func (uh *userHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		response.InternalServerError(w, errors.Wrap(err, "failed to create user"), "failed to create user")
 		return
+	}
+
+	err = os.Mkdir(os.Getenv("FILE_PATH")+"/users/"+user.UserID, os.ModeDir)
+	if err != nil {
+		response.InternalServerError(w, errors.Wrap(err, "failed to create user dir"), "failed to create user dir")
 	}
 
 	response.Success(w, response.ConvertToUserResponse(user))

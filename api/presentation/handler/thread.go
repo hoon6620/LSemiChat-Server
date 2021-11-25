@@ -6,6 +6,7 @@ import (
 	"app/api/presentation/request"
 	"app/api/presentation/response"
 	"net/http"
+	"os"
 
 	"github.com/pkg/errors"
 )
@@ -56,6 +57,11 @@ func (th *threadHandler) Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		response.InternalServerError(w, errors.Wrap(err, "failed to create thread"), "failed to create thread")
 		return
+	}
+
+	err = os.Mkdir(os.Getenv("FILE_PATH")+"/threads/"+thread.ID, os.ModeDir)
+	if err != nil {
+		response.InternalServerError(w, errors.Wrap(err, "failed to create user dir"), "failed to create user dir")
 	}
 
 	response.Success(w, response.ConvertToThreadResponse(thread))

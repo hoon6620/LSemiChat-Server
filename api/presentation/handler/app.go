@@ -50,6 +50,6 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 		ThreadHandler:   NewThreadHandler(threadInteractor),
 		MessageHandler:  NewMessageHandler(messageInteractor, threadInteractor),
 		SocketHandler:   NewSocketHandler(messageInteractor, threadInteractor),
-		FileHandler:     NewFileHandler(userInteractor, threadInteractor),
+		FileHandler:     NewFileHandler(threadInteractor, messageInteractor),
 	}
 }

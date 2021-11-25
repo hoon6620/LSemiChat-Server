@@ -52,6 +52,7 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 	s.Handler.HandleFunc("/account", appHandler.UserHandler.Create).Methods(http.MethodPost, http.MethodOptions)
 	s.Handler.HandleFunc("/users", appHandler.UserHandler.GetAll).Methods(http.MethodGet, http.MethodOptions)
 	s.Handler.HandleFunc("/users/{id}", appHandler.UserHandler.GetByID).Methods(http.MethodGet, http.MethodOptions)
+	s.Handler.HandleFunc("/users/{id}/img", appHandler.FileHandler.GetUserIcon).Methods(http.MethodGet, http.MethodOptions)
 	s.Handler.HandleFunc("/users/{id}/follows", appHandler.UserHandler.GetFollows).Methods(http.MethodGet, http.MethodOptions)
 	s.Handler.HandleFunc("/users/{id}/followers", appHandler.UserHandler.GetFollowers).Methods(http.MethodGet, http.MethodOptions)
 	s.Handler.HandleFunc("/categories", appHandler.CategoryHandler.GetAll).Methods(http.MethodGet, http.MethodOptions)
@@ -67,9 +68,13 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 		authRouter.HandleFunc("/account", appHandler.UserHandler.GetMe).Methods(http.MethodGet, http.MethodOptions)
 		authRouter.HandleFunc("/account", appHandler.UserHandler.DeleteMe).Methods(http.MethodDelete, http.MethodOptions)
 
+		authRouter.HandleFunc("/account/img", appHandler.FileHandler.SetUserIcon).Methods(http.MethodPost, http.MethodOptions)
 		authRouter.HandleFunc("/account/profile", appHandler.UserHandler.UpdateProfile).Methods(http.MethodPut, http.MethodOptions)
 		authRouter.HandleFunc("/account/user-id", appHandler.UserHandler.UpdateUserID).Methods(http.MethodPut, http.MethodOptions)
 		authRouter.HandleFunc("/account/password", appHandler.UserHandler.UpdatePassword).Methods(http.MethodPut, http.MethodOptions)
+
+		authRouter.HandleFunc("/account/tags", appHandler.TagHandler.AddTagToUser).Methods(http.MethodPost, http.MethodOptions)
+		authRouter.HandleFunc("/account/tags/{tagID}", appHandler.TagHandler.RemoveTagFromUser).Methods(http.MethodDelete, http.MethodOptions)
 
 		authRouter.HandleFunc("/users/{followedUUID}/follows", appHandler.UserHandler.Follow).Methods(http.MethodPost, http.MethodOptions)
 		authRouter.HandleFunc("/users/{followedUUID}/follows", appHandler.UserHandler.Unfollow).Methods(http.MethodDelete, http.MethodOptions)
@@ -88,13 +93,10 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.GetByThreadID).Methods(http.MethodGet, http.MethodOptions)
 		authRouter.HandleFunc("/threads/{threadID}/messages", appHandler.MessageHandler.Create).Methods(http.MethodPost, http.MethodOptions)
-		authRouter.HandleFunc("/threads/{threadID}/img", appHandler.FileHandler.Upload).Methods(http.MethodPost, http.MethodOptions)
-
 		authRouter.HandleFunc("/threads/{threadID}/messages/{messageID}", appHandler.MessageHandler.AddFavorite).Methods(http.MethodPost, http.MethodOptions)
 
-		authRouter.HandleFunc("/account/tags", appHandler.TagHandler.AddTagToUser).Methods(http.MethodPost, http.MethodOptions)
-
-		authRouter.HandleFunc("/account/tags/{tagID}", appHandler.TagHandler.RemoveTagFromUser).Methods(http.MethodDelete, http.MethodOptions)
+		authRouter.HandleFunc("/threads/{threadID}/files", appHandler.FileHandler.Upload).Methods(http.MethodPost, http.MethodOptions)
+		authRouter.HandleFunc("/threads/{threadID}/files/{fileID}", appHandler.FileHandler.Download).Methods(http.MethodGet, http.MethodOptions)
 
 		authRouter.HandleFunc("/threads/{threadID}/tags", appHandler.TagHandler.AddTagToThread).Methods(http.MethodPost, http.MethodOptions)
 
@@ -102,7 +104,6 @@ func (s *server) Route(appHandler *handler.AppHandler) {
 
 		authRouter.HandleFunc("/ws", appHandler.SocketHandler.WebsocketConnect).Methods(http.MethodGet, http.MethodOptions)
 
-		authRouter.HandleFunc("/img/{threadID}/{fileID}", appHandler.FileHandler.Download).Methods(http.MethodGet, http.MethodOptions)
 	}
 
 	{

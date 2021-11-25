@@ -7,4 +7,5 @@ const (
 	DBName     = "ls_chat"
 	DBHost     = "db"
 	DBPort     = "3306"
+	ImgPath    = "/images"
 )

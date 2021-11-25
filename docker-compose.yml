@@ -17,7 +17,7 @@ services:
       MYSQL_PORT: 3306
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      FILE_PATH: ./img/
+      FILE_PATH: /images
     volumes:
       - .:/go/src/app
     ports:
