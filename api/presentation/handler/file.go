@@ -129,11 +129,10 @@ func (fh *fileHandler) GetUserIcon(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(w, errors.Wrap(err, "path parameter is empty"), "path parameter is empty")
 		return
 	}
-	if fInfo, err := os.Stat(fh.imgPath + "/users/" + userID + "/icon"); err != nil {
+	if _, err := os.Stat(fh.imgPath + "/users/" + userID + "/icon"); err != nil {
 		response.BadRequest(w, errors.Wrap(err, "file is not exist"), "file is not exist")
 		return
 	} else {
-		llog.Info(fInfo)
 		http.ServeFile(w, r, fh.imgPath+"/users/"+userID+"/icon")
 	}
 }
