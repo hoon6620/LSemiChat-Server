@@ -20,9 +20,9 @@ makeコマンドが入っていなければ
 // 初期起動
 docker-compose up -d
 // 停止
-docker-compose start
-// 再開
 docker-compose stop
+// 再開
+docker-compose start
 // 終了
 docker-compose down --rmi local --volumes
 ```

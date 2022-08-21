@@ -25,14 +25,16 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 	tagRepository := repository.NewTagRepository(sqlHandler)
 	threadRepository := repository.NewThreadRepository(sqlHandler)
 	messageRepository := repository.NewMessageRepository(sqlHandler)
+	fileRepository := repository.NewFileRepository()
 
 	// service
-	userService := service.NewUserService(userRepository)
+	userService := service.NewUserService(userRepository, fileRepository)
 	authService := service.NewAuthService()
 	categoryService := service.NewCategoryService(categoryRepository)
 	tagService := service.NewTagService(tagRepository)
-	threadService := service.NewThreadService(threadRepository)
+	threadService := service.NewThreadService(threadRepository, fileRepository)
 	messageService := service.NewMessageService(messageRepository)
+	fileService := service.NewFileService(fileRepository)
 
 	// interactor
 	userInteractor := interactor.NewUserInteractor(userService, authService, tagService, categoryService)
@@ -41,6 +43,7 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 	tagInteractor := interactor.NewTagInteractor(tagService, categoryService, userService, threadService)
 	threadInteractor := interactor.NewThreadInteractor(threadService, userService, tagService, categoryService)
 	messageInteractor := interactor.NewMessageInteractor(messageService, threadService, userService)
+	fileInteractor := interactor.NewFileInteractor(fileService)
 
 	return &AppHandler{
 		AuthHandler:     NewAuthHandler(authInteractor),
@@ -49,7 +52,7 @@ func NewAppHandler(sqlHandler database.SQLHandler) *AppHandler {
 		TagHandler:      NewTagHandler(tagInteractor, categoryInteractor),
 		ThreadHandler:   NewThreadHandler(threadInteractor),
 		MessageHandler:  NewMessageHandler(messageInteractor, threadInteractor),
-		SocketHandler:   NewSocketHandler(messageInteractor, threadInteractor),
-		FileHandler:     NewFileHandler(threadInteractor, messageInteractor),
+		SocketHandler:   NewSocketHandler(messageInteractor, userInteractor, threadInteractor),
+		FileHandler:     NewFileHandler(fileInteractor, userInteractor, threadInteractor, messageInteractor),
 	}
 }

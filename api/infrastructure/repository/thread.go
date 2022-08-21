@@ -77,6 +77,34 @@ func (tr *threadRepository) FindByID(id string) (*entity.Thread, error) {
 	return &thread, nil
 }
 
+func (tr *threadRepository) FindByUserID(userID string) ([]*entity.Thread, error) {
+	rows, err := tr.sqlHandler.Query(`
+		SELECT t.id, t.name, t.description, t.limit_users, t.user_id, t.is_public, t.created_at, t.updated_at
+		FROM threads AS t
+		JOIN users_threads AS ut
+		ON t.id = ut.thread_id
+		WHERE ut.user_id=?
+	`, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to select")
+	}
+
+	var threads []*entity.Thread
+	for rows.Next() {
+		var thread entity.Thread
+		var author entity.User
+		if err = rows.Scan(&thread.ID, &thread.Name, &thread.Description, &thread.LimitUsers, &author.ID, &thread.IsPublic, &thread.CreatedAt, &thread.UpdatedAt); err != nil {
+			if rows.CheckNoRows(err) {
+				return nil, nil
+			}
+			return nil, errors.Wrap(err, "failed to scan")
+		}
+		thread.Author = &author
+		threads = append(threads, &thread)
+	}
+	return threads, nil
+}
+
 func (tr *threadRepository) FindOnlyPublic() ([]*entity.Thread, error) {
 	rows, err := tr.sqlHandler.Query(`
 		SELECT id, name, description, limit_users, user_id, is_public, created_at, updated_at

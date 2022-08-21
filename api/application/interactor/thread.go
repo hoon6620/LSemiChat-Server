@@ -11,6 +11,7 @@ type ThreadInteractor interface {
 	Create(name, description string, limitUsers, isPublic int, authorID string) (*entity.Thread, error)
 	GetAll() ([]*entity.Thread, error)
 	GetByID(id string) (*entity.Thread, error)
+	GetByUserID(userID string) ([]*entity.Thread, error)
 	GetOnlyPublic() ([]*entity.Thread, error)
 	GetMembersByThreadID(id string) ([]*entity.User, error)
 	Update(id, name, description string, limitUsers, isPublic int) (*entity.Thread, error)
@@ -93,7 +94,20 @@ func (ti *threadInteractor) GetByID(id string) (*entity.Thread, error) {
 	thread.Author.Tags = AddCategoryToTag(userTags, ti.categoryService)
 	thread.Tags = AddCategoryToTag(threadTags, ti.categoryService)
 	return thread, nil
+}
 
+func (ti *threadInteractor) GetByUserID(userID string) ([]*entity.Thread, error) {
+	user, err := ti.userService.GetByUserID(userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get user")
+	}
+
+	threads, err := ti.threadService.GetByUserID(user.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get threads")
+	}
+
+	return threads, nil
 }
 
 func (ti *threadInteractor) GetOnlyPublic() ([]*entity.Thread, error) {
@@ -172,7 +186,8 @@ func (ti *threadInteractor) AddMember(threadID, userID string) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to get user")
 	}
-	if err = ti.threadService.AddMember(threadID, user.ID, 0); err != nil { // TODO: めっちゃハードコーディングやん
+	if err = ti.threadService.AddMember(threadID, user.ID, 0); err != nil {
+		// TODO: めっちゃハードコーディングやん
 		return errors.Wrap(err, "failed to add member")
 	}
 	return nil

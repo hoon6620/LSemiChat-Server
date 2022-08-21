@@ -26,26 +26,6 @@ func New() (SQLHandler, error) {
 	//nosql connect
 	nosql.New()
 
-	//create image dir
-	imgPath := os.Getenv("FILE_PATH")
-	if imgPath == "" {
-		imgPath = constants.ImgPath
-	}
-	if _, err := os.Stat(imgPath); os.IsNotExist(err) {
-		err := os.Mkdir(imgPath, os.ModeDir)
-		if err != nil {
-			llog.Error(err)
-		}
-		err = os.Mkdir(imgPath+"/users", os.ModeDir)
-		if err != nil {
-			llog.Error(err)
-		}
-		err = os.Mkdir(imgPath+"/threads", os.ModeDir)
-		if err != nil {
-			llog.Error(err)
-		}
-	}
-
 	//databse connect
 	dbuser := os.Getenv("MYSQL_USER")
 	if dbuser == "" {

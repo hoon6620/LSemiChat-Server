@@ -12,6 +12,7 @@ type ThreadService interface {
 	New(name, description string, limitUsers, isPublic int, author *entity.User) (*entity.Thread, error)
 	GetAll() ([]*entity.Thread, error)
 	GetByID(id string) (*entity.Thread, error)
+	GetByUserID(userID string) ([]*entity.Thread, error)
 	GetOnlyPublic() ([]*entity.Thread, error)
 	GetMembersByThreadID(id string) ([]*entity.User, error)
 	Update(thread *entity.Thread, name, description string, limitUsers, isPublic int) (*entity.Thread, error)
@@ -22,11 +23,13 @@ type ThreadService interface {
 
 type threadService struct {
 	threadRepository repository.ThreadRepository
+	fileRepository   repository.FileRepository
 }
 
-func NewThreadService(tr repository.ThreadRepository) ThreadService {
+func NewThreadService(tr repository.ThreadRepository, fr repository.FileRepository) ThreadService {
 	return &threadService{
 		threadRepository: tr,
+		fileRepository:   fr,
 	}
 }
 
@@ -49,6 +52,7 @@ func (ts *threadService) New(name, description string, limitUsers, isPublic int,
 	if err = ts.threadRepository.Create(thread); err != nil {
 		return nil, errors.Wrap(err, "failed to create thread")
 	}
+	ts.fileRepository.CreateThreadDir(id)
 	return thread, nil
 }
 
@@ -66,6 +70,14 @@ func (ts *threadService) GetByID(id string) (*entity.Thread, error) {
 		return nil, errors.Wrap(err, "failed to get thread")
 	}
 	return thread, nil
+}
+
+func (ts *threadService) GetByUserID(userID string) ([]*entity.Thread, error) {
+	threads, err := ts.threadRepository.FindByUserID(userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get threads")
+	}
+	return threads, nil
 }
 
 func (ts *threadService) GetOnlyPublic() ([]*entity.Thread, error) {

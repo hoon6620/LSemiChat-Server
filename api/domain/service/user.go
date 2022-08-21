@@ -11,6 +11,7 @@ import (
 
 type userService struct {
 	userRepository repository.UserRepository
+	fileRepository repository.FileRepository
 }
 
 type UserService interface {
@@ -29,20 +30,21 @@ type UserService interface {
 	GetFollowers(id string) ([]*entity.User, error)
 }
 
-func NewUserService(ur repository.UserRepository) UserService {
+func NewUserService(ur repository.UserRepository, fr repository.FileRepository) UserService {
 	return &userService{
 		userRepository: ur,
+		fileRepository: fr,
 	}
 }
 
 func (us *userService) New(userID, name, mail, image, profile, password string, isAdmin int) (*entity.User, error) {
-	id, err := uuid.NewRandom()
+	id, err := GenerateUUID()
 	if err != nil {
 		return nil, err
 	}
 	now := time.Now()
 	user := &entity.User{
-		ID:        id.String(),
+		ID:        id,
 		UserID:    userID,
 		Name:      name,
 		Mail:      mail,
@@ -58,6 +60,7 @@ func (us *userService) New(userID, name, mail, image, profile, password string, 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert db")
 	}
+	us.fileRepository.CreateUserDir(id)
 	return user, nil
 }
 

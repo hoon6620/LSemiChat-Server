@@ -15,6 +15,7 @@ type ThreadHandler interface {
 	Create(w http.ResponseWriter, r *http.Request)               //Create thread
 	GetAll(w http.ResponseWriter, r *http.Request)               //Get all threads
 	GetByID(w http.ResponseWriter, r *http.Request)              //Get thread by ID
+	GetByUserID(w http.ResponseWriter, r *http.Request)          //Get thread by user ID
 	GetOnlyPublic(w http.ResponseWriter, r *http.Request)        //Get public thread
 	GetMembersByThreadID(w http.ResponseWriter, r *http.Request) //Get members in thread
 	Update(w http.ResponseWriter, r *http.Request)               //Thread update
@@ -88,6 +89,20 @@ func (th *threadHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	response.Success(w, response.ConvertToThreadResponse(thread))
+}
+
+func (th *threadHandler) GetByUserID(w http.ResponseWriter, r *http.Request) {
+	userID, err := lcontext.GetUserIDFromContext(r.Context())
+	if err != nil {
+		response.Unauthorized(w, errors.Wrap(err, "failed to authentication"), "failed to authentication. please login")
+		return
+	}
+	threads, err := th.threadInteractor.GetByUserID(userID)
+	if err != nil {
+		response.InternalServerError(w, errors.Wrap(err, "failed to get threads"), "failed to get threads")
+		return
+	}
+	response.Success(w, response.ConvertToThreadsResponse(threads))
 }
 
 func (th *threadHandler) GetOnlyPublic(w http.ResponseWriter, r *http.Request) {

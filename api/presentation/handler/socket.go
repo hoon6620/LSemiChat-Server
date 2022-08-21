@@ -20,12 +20,14 @@ type SocketHandler interface {
 
 type socketHandler struct {
 	messageInteractor interactor.MessageInteractor
+	userInteractor    interactor.UserInteractor
 	threadInteractor  interactor.ThreadInteractor
 }
 
-func NewSocketHandler(mi interactor.MessageInteractor, ti interactor.ThreadInteractor) SocketHandler {
+func NewSocketHandler(mi interactor.MessageInteractor, ui interactor.UserInteractor, ti interactor.ThreadInteractor) SocketHandler {
 	return &socketHandler{
 		messageInteractor: mi,
+		userInteractor:    ui,
 		threadInteractor:  ti,
 	}
 }
@@ -77,7 +79,7 @@ func (sh *socketHandler) WebsocketConnect(w http.ResponseWriter, r *http.Request
 	connList[userID] = connect
 	if thread != "" {
 		SendNotices(userID, "Web Socket Connected (room: "+thread+")")
-		sh.webSocketProccessing(connect, userID, thread)
+		go sh.webSocketProccessing(connect, userID, thread)
 	} else {
 		SendNotices(userID, "Web Socket Connected")
 	}
@@ -103,6 +105,7 @@ func (sh *socketHandler) webSocketProccessing(connect *websocket.Conn, userID st
 			llog.Error(err)
 			break
 		}
+
 		//check datatype
 		if sd.Type == "Message" {
 			var message SocketMessageRequest
@@ -202,15 +205,17 @@ func (sh *socketHandler) CheckReadOnly(connect *websocket.Conn, userID string) (
 	}
 
 	if sd.Data == "" {
-		return "", nil
+		return "", errors.New("Socket data is empty")
+	}
+	user, err := sh.userInteractor.GetByID(userID)
+	if err != nil {
+		return "", err
 	}
 
-	return sd.Data, nil //for test
-
-	// //check authorization
-	// if !sh.threadInteractor.IsParticipated(sd.Data, userID) {
-	// 	return "", errors.New(userID + " are not participated in room " + sd.Data)
-	// } else {
-	// 	return sd.Data, nil
-	// }
+	//check authorization
+	if !sh.threadInteractor.IsParticipated(sd.Data, user.ID) {
+		return "", errors.New(userID + " are not participated in room " + sd.Data)
+	} else {
+		return sd.Data, nil
+	}
 }
