@@ -60,7 +60,10 @@ func (us *userService) New(userID, name, mail, image, profile, password string, 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to insert db")
 	}
-	us.fileRepository.CreateUserDir(id)
+	err = us.fileRepository.CreateUserDir(id)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create dir")
+	}
 	return user, nil
 }
 

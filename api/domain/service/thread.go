@@ -52,7 +52,9 @@ func (ts *threadService) New(name, description string, limitUsers, isPublic int,
 	if err = ts.threadRepository.Create(thread); err != nil {
 		return nil, errors.Wrap(err, "failed to create thread")
 	}
-	ts.fileRepository.CreateThreadDir(id)
+	if err = ts.fileRepository.CreateThreadDir(id); err != nil {
+		return nil, errors.Wrap(err, "failed to create dir")
+	}
 	return thread, nil
 }
 
