@@ -41,8 +41,14 @@ func (fr *fileRepository) SetUserIcon(userID string, file []byte) error {
 }
 
 func (fr *fileRepository) GetUserIcon(userID string) ([]byte, error) {
-	return readFile(fr.filePath + "/users/" + userID + "/icon.jpg")
-
+	icon, err := readFile(fr.filePath + "/users/" + userID + "/icon.jpg")
+	if err != nil {
+		icon, err = readFile(constants.DefaultIcon)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return icon, nil
 }
 
 func (fr *fileRepository) SetThreadIcon(threadID string, file []byte) error {
@@ -50,7 +56,14 @@ func (fr *fileRepository) SetThreadIcon(threadID string, file []byte) error {
 }
 
 func (fr *fileRepository) GetThreadIcon(threadID string) ([]byte, error) {
-	return readFile(fr.filePath + "/threads/" + threadID + "/icon.jpg")
+	icon, err := readFile(fr.filePath + "/threads/" + threadID + "/icon.jpg")
+	if err != nil {
+		icon, err = readFile(constants.DefaultIcon)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return icon, nil
 }
 
 func (fr *fileRepository) CreateThreadDir(threadID string) error {
